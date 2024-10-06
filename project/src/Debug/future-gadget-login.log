@@ -1,0 +1,16 @@
+﻿  imgui.cpp
+  imgui_demo.cpp
+  imgui_draw.cpp
+  imgui_tables.cpp
+  imgui_widgets.cpp
+  imgui_impl_dx11.cpp
+  imgui_impl_win32.cpp
+  d3d_helpers.cpp
+  imgui_init_helpers.cpp
+  main.cpp
+  main_login.cpp
+  windows_helpers.cpp
+  Generating Code...
+  future-gadget-login.vcxproj -> E:\SourceCode\imgui\future-gadget-login\project\src\Debug\future-gadget-login.exe
+  'pwsh.exe' is not recognized as an internal or external command,
+  operable program or batch file.
