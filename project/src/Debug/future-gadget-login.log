@@ -8,7 +8,6 @@
   d3d_helpers.cpp
   imgui_init_helpers.cpp
   main.cpp
-  main_login.cpp
   windows_helpers.cpp
   Generating Code...
   future-gadget-login.vcxproj -> E:\SourceCode\imgui\future-gadget-login\project\src\Debug\future-gadget-login.exe
