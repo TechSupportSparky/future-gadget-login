@@ -1,0 +1,11 @@
+E:\SourceCode\imgui\future-gadget-login\backends\imgui.cpp;E:\SourceCode\imgui\future-gadget-login\project\build\Release\imgui.obj
+E:\SourceCode\imgui\future-gadget-login\backends\imgui_draw.cpp;E:\SourceCode\imgui\future-gadget-login\project\build\Release\imgui_draw.obj
+E:\SourceCode\imgui\future-gadget-login\backends\imgui_impl_dx11.cpp;E:\SourceCode\imgui\future-gadget-login\project\build\Release\imgui_impl_dx11.obj
+E:\SourceCode\imgui\future-gadget-login\backends\imgui_impl_win32.cpp;E:\SourceCode\imgui\future-gadget-login\project\build\Release\imgui_impl_win32.obj
+E:\SourceCode\imgui\future-gadget-login\backends\imgui_tables.cpp;E:\SourceCode\imgui\future-gadget-login\project\build\Release\imgui_tables.obj
+E:\SourceCode\imgui\future-gadget-login\backends\imgui_widgets.cpp;E:\SourceCode\imgui\future-gadget-login\project\build\Release\imgui_widgets.obj
+E:\SourceCode\imgui\future-gadget-login\project\src\lib_helpers\d3d_helpers.cpp;E:\SourceCode\imgui\future-gadget-login\project\build\Release\d3d_helpers.obj
+E:\SourceCode\imgui\future-gadget-login\project\src\lib_helpers\imgui_impl\imgui_init_helpers.cpp;E:\SourceCode\imgui\future-gadget-login\project\build\Release\imgui_init_helpers.obj
+E:\SourceCode\imgui\future-gadget-login\project\src\lib_helpers\windows_helpers.cpp;E:\SourceCode\imgui\future-gadget-login\project\build\Release\windows_helpers.obj
+E:\SourceCode\imgui\future-gadget-login\project\src\main.cpp;E:\SourceCode\imgui\future-gadget-login\project\build\Release\main.obj
+E:\SourceCode\imgui\future-gadget-login\project\src\screens\main_login.cpp;E:\SourceCode\imgui\future-gadget-login\project\build\Release\main_login.obj

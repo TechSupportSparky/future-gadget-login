@@ -1,0 +1,94 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="imgui">
+      <UniqueIdentifier>{0587d7a3-f2ce-4d56-b84f-a0005d3bfce6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="sources">
+      <UniqueIdentifier>{08e36723-ce4f-4cff-9662-c40801cf1acf}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="sources\lib_helpers">
+      <UniqueIdentifier>{34fe94f9-ff4f-45a6-911a-1dc89a6b1de6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="sources\screens">
+      <UniqueIdentifier>{4c993e59-aa8d-4256-a9b5-a1dde07c55a0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="sources\lib_helpers\imgui_impl">
+      <UniqueIdentifier>{34ebb7b5-3306-43d2-877a-be8b120e171c}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\imconfig.h">
+      <Filter>imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\imgui.h">
+      <Filter>imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\imgui_internal.h">
+      <Filter>imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\backends\imgui_impl_win32.h">
+      <Filter>sources\lib_helpers\imgui_impl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\backends\imgui_impl_dx11.h">
+      <Filter>sources\lib_helpers\imgui_impl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\lib_helpers\d3d_helpers.h">
+      <Filter>sources\lib_helpers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\lib_helpers\imgui_impl\imgui_init_helpers.h">
+      <Filter>sources\lib_helpers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\lib_helpers\windows_helpers.h">
+      <Filter>sources\lib_helpers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\screens\main_login.h">
+      <Filter>sources\screens</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\backends\imgui.h">
+      <Filter>imgui</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\backends\imgui_impl_dx11.cpp">
+      <Filter>sources\lib_helpers\imgui_impl</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\backends\imgui_impl_win32.cpp">
+      <Filter>sources\lib_helpers\imgui_impl</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\main.cpp" />
+    <ClCompile Include="..\src\lib_helpers\d3d_helpers.cpp">
+      <Filter>sources\lib_helpers</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\lib_helpers\imgui_impl\imgui_init_helpers.cpp">
+      <Filter>sources\lib_helpers</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\lib_helpers\windows_helpers.cpp">
+      <Filter>sources\lib_helpers</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\screens\main_login.cpp">
+      <Filter>sources\screens</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\backends\imgui.cpp">
+      <Filter>imgui</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\backends\imgui_draw.cpp">
+      <Filter>imgui</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\backends\imgui_tables.cpp">
+      <Filter>imgui</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\backends\imgui_widgets.cpp">
+      <Filter>imgui</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\README.txt" />
+    <None Include="..\..\misc\debuggers\imgui.natvis">
+      <Filter>imgui</Filter>
+    </None>
+    <None Include="..\..\misc\debuggers\imgui.natstepfilter">
+      <Filter>imgui</Filter>
+    </None>
+  </ItemGroup>
+</Project>
