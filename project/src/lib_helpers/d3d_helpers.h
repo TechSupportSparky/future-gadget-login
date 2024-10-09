@@ -2,7 +2,10 @@
 
 #include <d3d11.h>
 #include <tchar.h>
+#include <vector>
 #include "imgui.h"
+
+using namespace std;
 
 extern ID3D11Device* g_pd3dDevice;
 extern ID3D11DeviceContext* g_pd3dDeviceContext;
@@ -25,3 +28,10 @@ int CreateD3DWindow(WNDCLASSEXW& outWc, HWND& outHandle);
 
 // Deals with clearing the screen and rendering the new frame
 void RenderAndPresent(ImGuiIO io);
+
+// Random texture data to confuse the AI!
+vector<unsigned char> GenerateNoiseData(int width, int height);
+ID3D11ShaderResourceView* CreateShaderResourceView(ID3D11Device* device, ID3D11Texture2D* texture);
+ID3D11Texture2D* CreateNoiseD11Texture(ID3D11Device* device, const std::vector<unsigned char>& noiseData, int width, int height);
+
+ID3D11ShaderResourceView* LoadTextureFromPNG(const wchar_t* filePath, ID3D11Device* device, ID3D11DeviceContext* deviceContext);

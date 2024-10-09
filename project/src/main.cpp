@@ -1,8 +1,9 @@
+#include "d3d_helpers.h"
 #include "imgui.h"
 #include "imgui_impl_win32.h"
 #include "imgui_impl_dx11.h"
 #include "imgui_init_helpers.h"
-#include "d3d_helpers.h"
+#include "main_login.h"
 #include "windows_helpers.h"
 #include <d3d11.h>
 #include <tchar.h>
@@ -11,39 +12,7 @@
 #include <mmsystem.h>
 #pragma comment(lib, "winmm.lib")
 
-
-void ShowLoginScreen(bool& showLoginScreen, bool& proceedToCaptcha)
-{
-    if (showLoginScreen)
-    {
-        // Setup the size and position for the first use
-        ImVec2 initialSize = ImVec2(600, 337);  
-        ImVec2 initialPos = ImVec2(300, 100);
-        ImGui::SetNextWindowSize(initialSize, ImGuiCond_FirstUseEver);
-        ImGui::SetNextWindowPos(initialPos, ImGuiCond_FirstUseEver);
-
-        ImGui::Begin("CONFIDENTIAL - FUTURE GADGET LABORATORY LOGIN");
-
-        // Username and password fields (non-editable)
-        ImGui::Text("Username:");
-        ImGui::BeginDisabled(true); 
-        ImGui::InputText("##username", (char*)"KuriGohan", IM_ARRAYSIZE("KuriGohan"), ImGuiInputTextFlags_ReadOnly);
-        
-        ImGui::Text("Password:");
-        ImGui::InputText("##password", (char*)"********", IM_ARRAYSIZE("********"), ImGuiInputTextFlags_ReadOnly);
-        ImGui::EndDisabled();
-
-        // Login Button
-        if (ImGui::Button("Login"))
-        {
-            // When login is clicked, proceed to CAPTCHA screen
-            showLoginScreen = false;  // Hide login screen
-            proceedToCaptcha = true;  // Show the CAPTCHA screen
-        }
-
-        ImGui::End();
-    }
-}
+ID3D11ShaderResourceView* backgroundTexture = nullptr;
 
 int main(int, char**)
 {
@@ -54,9 +23,12 @@ int main(int, char**)
     SetupImGuiWindow(io);
     InitializeSystem(hwnd);
 
+    backgroundTexture = LoadTextureFromPNG(L"C:\\Users\\TechS\\Downloads\\FutureGadetLabHomepage.png", g_pd3dDevice, g_pd3dDeviceContext);
+
     // Variables for controlling UI state
     bool showLoginScreen = true;
     bool proceedToCaptcha = false;
+    bool showDmailTrigger = false;
     bool done = false;
     while (!done)
     {
@@ -69,115 +41,13 @@ int main(int, char**)
         ImGui_ImplWin32_NewFrame();
         ImGui::NewFrame();
 
-        // Render the login screen or transition to CAPTCHA
-        ShowLoginScreen(showLoginScreen, proceedToCaptcha);
+        if (backgroundTexture) DrawBackground(backgroundTexture);
 
-        // Placeholder for the CAPTCHA screen - implement later
-        if (proceedToCaptcha)
-        {
-            ImGui::Begin("CAPTCHA Screen");
-            ImGui::Text("This is where the CAPTCHA logic would go.");
-            ImGui::End();
-        }
+        // Render the login screen or transition to CAPTCHA
+        ShowLoginScreen(showLoginScreen, proceedToCaptcha, showDmailTrigger);
 
         RenderAndPresent(io);
     }
-
-    // Old draw logic
-    /*
-    // Our state
-    bool show_demo_window = true;
-    bool show_another_window = false;
-    ImVec4 clear_color = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
-
-    // Main loop
-    bool done = false;
-    while (!done)
-    {
-        // Poll and handle messages (inputs, window resize, etc.)
-        // See the WndProc() function below for our to dispatch events to the Win32 backend.
-        MSG msg;
-        while (::PeekMessage(&msg, nullptr, 0U, 0U, PM_REMOVE))
-        {
-            ::TranslateMessage(&msg);
-            ::DispatchMessage(&msg);
-            if (msg.message == WM_QUIT)
-                done = true;
-        }
-        if (done)
-            break;
-
-        // Handle window being minimized or screen locked
-        if (g_SwapChainOccluded && g_pSwapChain->Present(0, DXGI_PRESENT_TEST) == DXGI_STATUS_OCCLUDED)
-        {
-            ::Sleep(10);
-            continue;
-        }
-        g_SwapChainOccluded = false;
-
-        // Handle window resize (we don't resize directly in the WM_SIZE handler)
-        if (g_ResizeWidth != 0 && g_ResizeHeight != 0)
-        {
-            CleanupRenderTarget();
-            g_pSwapChain->ResizeBuffers(0, g_ResizeWidth, g_ResizeHeight, DXGI_FORMAT_UNKNOWN, 0);
-            g_ResizeWidth = g_ResizeHeight = 0;
-            CreateRenderTarget();
-        }
-
-        // Start the Dear ImGui frame
-        ImGui_ImplDX11_NewFrame();
-        ImGui_ImplWin32_NewFrame();
-        ImGui::NewFrame();
-
-        // 1. Show the big demo window (Most of the sample code is in ImGui::ShowDemoWindow()! You can browse its code to learn more about Dear ImGui!).
-        if (show_demo_window)
-            ImGui::ShowDemoWindow(&show_demo_window);
-
-        // 2. Show a simple window that we create ourselves. We use a Begin/End pair to create a named window.
-        {
-            static float f = 0.0f;
-            static int counter = 0;
-
-            ImGui::Begin("Hello, world!");                          // Create a window called "Hello, world!" and append into it.
-
-            ImGui::Text("This is some useful text.");               // Display some text (you can use a format strings too)
-            ImGui::Checkbox("Demo Window", &show_demo_window);      // Edit bools storing our window open/close state
-            ImGui::Checkbox("Another Window", &show_another_window);
-
-            ImGui::SliderFloat("float", &f, 0.0f, 1.0f);            // Edit 1 float using a slider from 0.0f to 1.0f
-            ImGui::ColorEdit3("clear color", (float*)&clear_color); // Edit 3 floats representing a color
-
-            if (ImGui::Button("Button"))                            // Buttons return true when clicked (most widgets return true when edited/activated)
-                counter++;
-            ImGui::SameLine();
-            ImGui::Text("counter = %d", counter);
-
-            ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / io.Framerate, io.Framerate);
-            ImGui::End();
-        }
-
-        // Rendering
-        ImGui::Render();
-        const float clear_color_with_alpha[4] = { clear_color.x * clear_color.w, clear_color.y * clear_color.w, clear_color.z * clear_color.w, clear_color.w };
-        g_pd3dDeviceContext->OMSetRenderTargets(1, &g_mainRenderTargetView, nullptr);
-        g_pd3dDeviceContext->ClearRenderTargetView(g_mainRenderTargetView, clear_color_with_alpha);
-        ImGui_ImplDX11_RenderDrawData(ImGui::GetDrawData());
-
-        // Update and Render additional Platform Windows
-        if (io.ConfigFlags & ImGuiConfigFlags_ViewportsEnable)
-        {
-            ImGui::UpdatePlatformWindows();
-            ImGui::RenderPlatformWindowsDefault();
-        }
-
-        // Present
-        HRESULT hr = g_pSwapChain->Present(1, 0);   // Present with vsync
-        //HRESULT hr = g_pSwapChain->Present(0, 0); // Present without vsync
-        g_SwapChainOccluded = (hr == DXGI_STATUS_OCCLUDED);
-
-    }
-    */
-
 
     ShutDown(wc, hwnd);
     return 0;

@@ -1,4 +1,9 @@
 #include "d3d_helpers.h"
+
+#include <d3d11.h>
+#include <wincodec.h>
+#include <wrl/client.h>
+#include <random>
 #include "imgui_impl_dx11.h"
 #include "windows_helpers.h"
 
@@ -90,7 +95,14 @@ int CreateD3DWindow(WNDCLASSEXW& outWc, HWND& outHandle)
     // Window parameters
     outWc = { sizeof(outWc), CS_CLASSDC, WndProc, 0L, 0L, GetModuleHandle(nullptr), nullptr, nullptr, nullptr, nullptr, L"ImGui Example", nullptr };
     ::RegisterClassExW(&outWc);
-    outHandle = ::CreateWindowW(outWc.lpszClassName, L"Dear ImGui DirectX11 Example", WS_OVERLAPPEDWINDOW, 100, 100, 1280, 720, nullptr, nullptr, outWc.hInstance, nullptr);
+    //outHandle = ::CreateWindowW(outWc.lpszClassName, L"Dear ImGui DirectX11 Example", WS_OVERLAPPEDWINDOW, 100, 100, width, height, nullptr, nullptr, outWc.hInstance, nullptr);
+    outHandle = ::CreateWindowW(
+        outWc.lpszClassName,
+        L"Future Gadget Lab Fullscreen Window",
+        WS_POPUP | WS_VISIBLE,                   // Use WS_POPUP and WS_VISIBLE to cover the entire screen without borders
+        0, 0, 1920, 1080,                        // Fullscreen size (1920x1080)
+        nullptr, nullptr, outWc.hInstance, nullptr
+    );
 
     // Initialize Direct3D
     if (!CreateDeviceD3D(outHandle))
@@ -102,11 +114,11 @@ int CreateD3DWindow(WNDCLASSEXW& outWc, HWND& outHandle)
 
     // Show the window
     ::ShowWindow(outHandle, SW_SHOWDEFAULT);
+    //::ShowWindow(outHandle, SW_HIDE);
     ::UpdateWindow(outHandle);
 
     return 0;
 }
-
 
 void RenderAndPresent(ImGuiIO io)
 {
@@ -115,6 +127,7 @@ void RenderAndPresent(ImGuiIO io)
     const float clear_color[4] = { 0.45f, 0.55f, 0.60f, 1.00f };
     g_pd3dDeviceContext->OMSetRenderTargets(1, &g_mainRenderTargetView, NULL);
     g_pd3dDeviceContext->ClearRenderTargetView(g_mainRenderTargetView, clear_color);
+
     ImGui_ImplDX11_RenderDrawData(ImGui::GetDrawData());
 
     g_pSwapChain->Present(1, 0); // Present with vsync
@@ -128,4 +141,172 @@ void RenderAndPresent(ImGuiIO io)
     // Present
     HRESULT hr = g_pSwapChain->Present(1, 0);   // Present with vsync
     g_SwapChainOccluded = (hr == DXGI_STATUS_OCCLUDED);
+}
+
+vector<unsigned char> GenerateNoiseData(int width, int height)
+{
+    std::vector<unsigned char> noiseData(width * height * 4);
+    std::mt19937 rng(std::random_device{}());
+    std::uniform_int_distribution<> dist(0, 255);
+
+    for (int i = 0; i < width * height * 4; i++)
+    {
+        noiseData[i] = static_cast<unsigned char>(dist(rng));
+    }
+
+    return noiseData;
+}
+
+ID3D11ShaderResourceView* CreateShaderResourceView(ID3D11Device* device, ID3D11Texture2D* texture)
+{
+    ID3D11ShaderResourceView* textureView = nullptr;
+    D3D11_SHADER_RESOURCE_VIEW_DESC srvDesc = {};
+    srvDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
+    srvDesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2D;
+    srvDesc.Texture2D.MipLevels = 1;
+
+    device->CreateShaderResourceView(texture, &srvDesc, &textureView);
+    return textureView;
+}
+
+ID3D11Texture2D* CreateNoiseD11Texture(ID3D11Device* device, const std::vector<unsigned char>& noiseData, int width, int height)
+{
+    D3D11_TEXTURE2D_DESC desc = {};
+    desc.Width = width;
+    desc.Height = height;
+    desc.MipLevels = 1;
+    desc.ArraySize = 1;
+    desc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
+    desc.SampleDesc.Count = 1;
+    desc.Usage = D3D11_USAGE_DEFAULT;
+    desc.BindFlags = D3D11_BIND_SHADER_RESOURCE;
+
+    D3D11_SUBRESOURCE_DATA initData = {};
+    initData.pSysMem = noiseData.data();
+    initData.SysMemPitch = width * 4;
+
+    ID3D11Texture2D* texture = nullptr;
+    device->CreateTexture2D(&desc, &initData, &texture);
+    return texture;
+}
+
+ID3D11ShaderResourceView* LoadTextureFromPNG(const wchar_t* filePath, ID3D11Device* device, ID3D11DeviceContext* deviceContext)
+{
+    using Microsoft::WRL::ComPtr;
+
+    // Initialize the WIC factory
+    ComPtr<IWICImagingFactory> wicFactory;
+    HRESULT hr = CoCreateInstance(
+        CLSID_WICImagingFactory,
+        nullptr,
+        CLSCTX_INPROC_SERVER,
+        IID_PPV_ARGS(&wicFactory)
+    );
+
+    // Failed to create WIC Imaging Factory
+    if (FAILED(hr))
+    {
+        return nullptr; 
+    }
+
+    ComPtr<IWICBitmapDecoder> decoder;
+    hr = wicFactory->CreateDecoderFromFilename(
+        filePath,
+        nullptr,
+        GENERIC_READ,
+        WICDecodeMetadataCacheOnDemand,
+        &decoder
+    );
+
+    // Couldn't decode image
+    if (FAILED(hr))
+    {
+        return nullptr; 
+    }
+
+    // Get the first frame of the image
+    ComPtr<IWICBitmapFrameDecode> frame;
+    hr = decoder->GetFrame(0, &frame);
+    if (FAILED(hr))
+    {
+        return nullptr;
+    }
+
+    // 32bpp RGBA for DirectX
+    ComPtr<IWICFormatConverter> formatConverter;
+    hr = wicFactory->CreateFormatConverter(&formatConverter);
+    if (FAILED(hr))
+    {
+        return nullptr;
+    }
+
+    hr = formatConverter->Initialize(
+        frame.Get(),
+        GUID_WICPixelFormat32bppRGBA,
+        WICBitmapDitherTypeNone,
+        nullptr,
+        0.0,
+        WICBitmapPaletteTypeCustom
+    );
+
+    if (FAILED(hr))
+    {
+        return nullptr; 
+    }
+
+    // Get the width and height of the image
+    UINT width, height;
+    hr = formatConverter->GetSize(&width, &height);
+    if (FAILED(hr))
+    {
+        return nullptr; 
+    }
+
+    // Copy the image data into a buffer
+    std::vector<BYTE> imageData(width * height * 4); // 4 bytes per pixel (RGBA)
+    hr = formatConverter->CopyPixels(
+        nullptr,
+        width * 4, // Number of bytes per row
+        static_cast<UINT>(imageData.size()),
+        imageData.data()
+    );
+
+    if (FAILED(hr))
+    {
+        return nullptr;
+    }
+
+    // Create a texture description
+    D3D11_TEXTURE2D_DESC textureDesc = {};
+    textureDesc.Width = width;
+    textureDesc.Height = height;
+    textureDesc.MipLevels = 1;
+    textureDesc.ArraySize = 1;
+    textureDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM; // 32-bit RGBA
+    textureDesc.SampleDesc.Count = 1;
+    textureDesc.Usage = D3D11_USAGE_DEFAULT;
+    textureDesc.BindFlags = D3D11_BIND_SHADER_RESOURCE;
+
+    // Describe the subresource data
+    D3D11_SUBRESOURCE_DATA initData = {};
+    initData.pSysMem = imageData.data();
+    initData.SysMemPitch = width * 4; 
+
+    // Create the texture
+    ComPtr<ID3D11Texture2D> texture;
+    hr = device->CreateTexture2D(&textureDesc, &initData, &texture);
+    if (FAILED(hr))
+    {
+        return nullptr; 
+    }
+
+    // Create a shader resource view for the texture
+    ID3D11ShaderResourceView* textureView = nullptr;
+    hr = device->CreateShaderResourceView(texture.Get(), nullptr, &textureView);
+    if (FAILED(hr))
+    {
+        return nullptr; 
+    }
+
+    return textureView;
 }

@@ -56,7 +56,6 @@
     <ClCompile Include="..\..\backends\imgui_impl_win32.cpp">
       <Filter>sources\lib_helpers\imgui_impl</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\main.cpp" />
     <ClCompile Include="..\src\lib_helpers\d3d_helpers.cpp">
       <Filter>sources\lib_helpers</Filter>
     </ClCompile>
@@ -81,14 +80,19 @@
     <ClCompile Include="..\..\backends\imgui_widgets.cpp">
       <Filter>imgui</Filter>
     </ClCompile>
+    <ClCompile Include="..\src\main.cpp">
+      <Filter>sources</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <None Include="..\README.txt" />
     <None Include="..\..\misc\debuggers\imgui.natvis">
       <Filter>imgui</Filter>
     </None>
     <None Include="..\..\misc\debuggers\imgui.natstepfilter">
       <Filter>imgui</Filter>
     </None>
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="..\..\README.txt" />
   </ItemGroup>
 </Project>
