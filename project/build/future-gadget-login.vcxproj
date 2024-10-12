@@ -73,6 +73,7 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <OutDir>$(ProjectDir)$(Configuration)\</OutDir>
     <IntDir>$(ProjectDir)$(Configuration)\</IntDir>
+    <CopyLocalDeploymentContent>false</CopyLocalDeploymentContent>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <OutDir>$(ProjectDir)$(Configuration)\</OutDir>
@@ -81,6 +82,7 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <OutDir>$(ProjectDir)$(Configuration)\</OutDir>
     <IntDir>$(ProjectDir)$(Configuration)\</IntDir>
+    <CopyLocalDeploymentContent>false</CopyLocalDeploymentContent>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -109,6 +111,14 @@
       <AdditionalLibraryDirectories>$(DXSDK_DIR)/Lib/x64;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <SubSystem>Console</SubSystem>
     </Link>
+    <PostBuildEvent>
+      <Command>robocopy "$(ProjectDir)\..\assets" "$(TargetDir)assets" /E /NDL /NFL /NJH /NJS
+REM del  /Q "$(TargetDir)*.obj"
+REM del  /Q "$(TargetDir)*.pdb"
+REM del  /Q "$(TargetDir)*.ilk"
+REM del  /Q "$(TargetDir)*.recipe"
+if %ERRORLEVEL% LSS 8 exit 0</Command>
+    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
@@ -147,6 +157,14 @@
       <AdditionalLibraryDirectories>$(DXSDK_DIR)/Lib/x64;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <SubSystem>Console</SubSystem>
     </Link>
+    <PostBuildEvent>
+      <Command>robocopy "$(ProjectDir)\..\assets" "$(TargetDir)assets" /E /NDL /NFL /NJH /NJS
+REM del  /Q "$(TargetDir)*.obj"
+REM del  /Q "$(TargetDir)*.pdb"
+REM del  /Q "$(TargetDir)*.ilk"
+REM del  /Q "$(TargetDir)*.recipe"
+if %ERRORLEVEL% LSS 8 exit 0</Command>
+    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="..\..\backends\imgui.h" />
@@ -161,6 +179,7 @@
     <ClInclude Include="..\src\lib_helpers\windows_helpers.h" />
     <ClInclude Include="..\src\screens\main_login.h" />
     <ClInclude Include="..\src\screens\phone.h" />
+    <ClInclude Include="resource.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\backends\imgui.cpp" />
@@ -181,19 +200,46 @@
     <None Include="..\..\misc\debuggers\imgui.natvis" />
   </ItemGroup>
   <ItemGroup>
-    <Text Include="..\..\README.txt" />
+    <Image Include="..\assets\images\DivergenceMeter.png">
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</DeploymentContent>
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</DeploymentContent>
+    </Image>
+    <Image Include="..\assets\images\FutureGadetLabHomepage.png">
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</DeploymentContent>
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</DeploymentContent>
+    </Image>
+    <Image Include="..\assets\images\GadetLab.png">
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</DeploymentContent>
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</DeploymentContent>
+    </Image>
+    <Image Include="..\assets\images\Phone.png">
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</DeploymentContent>
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</DeploymentContent>
+    </Image>
+    <Image Include="..\assets\images\TimeTravelTexture.png">
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</DeploymentContent>
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</DeploymentContent>
+    </Image>
+    <Image Include="..\src\resources\gel.ico" />
   </ItemGroup>
   <ItemGroup>
-    <Image Include="..\assets\images\DivergenceMeter.png" />
-    <Image Include="..\assets\images\FutureGadetLabHomepage.png" />
-    <Image Include="..\assets\images\Phone.png" />
-    <Image Include="..\assets\images\TimeTravelTexture.png" />
+    <Font Include="..\assets\font\Garamond Light Condensed SSi Light Condensed.ttf">
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</DeploymentContent>
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</DeploymentContent>
+    </Font>
   </ItemGroup>
   <ItemGroup>
-    <Font Include="..\assets\font\Garamond Light Condensed SSi Light Condensed.ttf" />
+    <Media Include="..\assets\audio\ReadingSteinerEffect.wav">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+      </ExcludedFromBuild>
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</DeploymentContent>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+      </ExcludedFromBuild>
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</DeploymentContent>
+    </Media>
   </ItemGroup>
   <ItemGroup>
-    <Media Include="..\assets\audio\ReadingSteinerEffect.wav" />
+    <ResourceCompile Include="future-gadget-login.rc" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

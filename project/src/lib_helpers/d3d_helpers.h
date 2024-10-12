@@ -34,4 +34,4 @@ vector<unsigned char> GenerateNoiseData(int width, int height);
 ID3D11ShaderResourceView* CreateShaderResourceView(ID3D11Device* device, ID3D11Texture2D* texture);
 ID3D11Texture2D* CreateNoiseD11Texture(ID3D11Device* device, const std::vector<unsigned char>& noiseData, int width, int height);
 
-ID3D11ShaderResourceView* LoadTextureFromPNG(const wchar_t* filePath, ID3D11Device* device, ID3D11DeviceContext* deviceContext);
+ID3D11ShaderResourceView* LoadTextureFromPNG(const wchar_t* filePath, ID3D11Device* device);

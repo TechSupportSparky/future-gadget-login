@@ -1,4 +1,5 @@
 #include "d3d_helpers.h"
+#include "globals.h"
 #include "imgui.h"
 #include "imgui_impl_win32.h"
 #include "imgui_impl_dx11.h"
@@ -12,13 +13,14 @@
 #include <mmsystem.h>
 #pragma comment(lib, "winmm.lib")
 
-ID3D11ShaderResourceView* backgroundTexture = nullptr;
 ImFont* phoneInputFont = nullptr;
 ImFont* defaultImguiFont = nullptr;
 
+ID3D11ShaderResourceView* backgroundTexture = nullptr;
+
 void LoadStartupResources()
 {
-    backgroundTexture = LoadTextureFromPNG(L"assets\\images\\FutureGadetLabHomepage.png", g_pd3dDevice, g_pd3dDeviceContext);
+    backgroundTexture = LoadTextureFromPNG(L"assets\\images\\FutureGadetLabHomepage.png", g_pd3dDevice);
     if (!backgroundTexture)
     {
         fprintf(stderr, "Failed to load background texture\n");

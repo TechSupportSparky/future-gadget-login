@@ -28,6 +28,9 @@
     <Filter Include="assets\audio">
       <UniqueIdentifier>{4287620f-a626-4f63-8993-70fde1d971b5}</UniqueIdentifier>
     </Filter>
+    <Filter Include="sources\resources">
+      <UniqueIdentifier>{059f5d71-2837-44c7-b467-cf8cea70a8ca}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\imconfig.h">
@@ -66,6 +69,7 @@
     <ClInclude Include="..\src\lib_helpers\globals.h">
       <Filter>sources\lib_helpers</Filter>
     </ClInclude>
+    <ClInclude Include="resource.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\backends\imgui_impl_dx11.cpp">
@@ -114,12 +118,6 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <Text Include="..\..\README.txt" />
-  </ItemGroup>
-  <ItemGroup>
-    <Image Include="..\assets\images\FutureGadetLabHomepage.png">
-      <Filter>assets\images</Filter>
-    </Image>
     <Image Include="..\assets\images\Phone.png">
       <Filter>assets\images</Filter>
     </Image>
@@ -128,6 +126,15 @@
     </Image>
     <Image Include="..\assets\images\DivergenceMeter.png">
       <Filter>assets\images</Filter>
+    </Image>
+    <Image Include="..\assets\images\FutureGadetLabHomepage.png">
+      <Filter>assets\images</Filter>
+    </Image>
+    <Image Include="..\assets\images\GadetLab.png">
+      <Filter>assets\images</Filter>
+    </Image>
+    <Image Include="..\src\resources\gel.ico">
+      <Filter>sources\resources</Filter>
     </Image>
   </ItemGroup>
   <ItemGroup>
@@ -139,5 +146,8 @@
     <Media Include="..\assets\audio\ReadingSteinerEffect.wav">
       <Filter>assets\audio</Filter>
     </Media>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="future-gadget-login.rc" />
   </ItemGroup>
 </Project>

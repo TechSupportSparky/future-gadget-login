@@ -5,7 +5,29 @@
       <FullPath>E:\SourceCode\imgui\future-gadget-login\project\build\Debug\future-gadget-login.exe</FullPath>
     </ProjectOutput>
   </ProjectOutputs>
-  <ContentFiles />
+  <ContentFiles>
+    <ContentFile>
+      <FullPath>E:\SourceCode\imgui\future-gadget-login\project\assets\font\Garamond Light Condensed SSi Light Condensed.ttf</FullPath>
+    </ContentFile>
+    <ContentFile>
+      <FullPath>E:\SourceCode\imgui\future-gadget-login\project\assets\images\DivergenceMeter.png</FullPath>
+    </ContentFile>
+    <ContentFile>
+      <FullPath>E:\SourceCode\imgui\future-gadget-login\project\assets\images\FutureGadetLabHomepage.png</FullPath>
+    </ContentFile>
+    <ContentFile>
+      <FullPath>E:\SourceCode\imgui\future-gadget-login\project\assets\images\GadetLab.png</FullPath>
+    </ContentFile>
+    <ContentFile>
+      <FullPath>E:\SourceCode\imgui\future-gadget-login\project\assets\images\Phone.png</FullPath>
+    </ContentFile>
+    <ContentFile>
+      <FullPath>E:\SourceCode\imgui\future-gadget-login\project\assets\images\TimeTravelTexture.png</FullPath>
+    </ContentFile>
+    <ContentFile>
+      <FullPath>E:\SourceCode\imgui\future-gadget-login\project\assets\audio\ReadingSteinerEffect.wav</FullPath>
+    </ContentFile>
+  </ContentFiles>
   <SatelliteDlls />
   <NonRecipeFileRefs />
 </Project>

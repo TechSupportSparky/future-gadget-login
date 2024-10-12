@@ -26,7 +26,7 @@ void CreatePhoneWindow()
         ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse;
 
     static ID3D11ShaderResourceView* PhoneTextureView = nullptr;
-    if (!PhoneTextureView) PhoneTextureView = LoadTextureFromPNG(L"assets\\images\\Phone.png", g_pd3dDevice, g_pd3dDeviceContext);
+    if (!PhoneTextureView) PhoneTextureView = LoadTextureFromPNG(L"assets\\images\\Phone.png", g_pd3dDevice);
     ImGui::Begin("Phone Window", nullptr, windowFlags);
     ImGui::Image((void*)PhoneTextureView, windowSize);
 }
@@ -36,7 +36,7 @@ void SetCaptchaStyles()
     static float pulseTimer = 0.0f;
 
     pulseTimer += ImGui::GetIO().DeltaTime * 2.0f;
-    float colorIntensity = (sin(pulseTimer) + 1.0f) * 0.5f;
+    float colorIntensity = (sinf(pulseTimer) + 1.0f) * 0.5f;
     ImVec4 borderColor = ImVec4(
         1.0f * colorIntensity, 1.0f * colorIntensity,
         1.0f * colorIntensity, 1.0f

@@ -196,7 +196,7 @@ ID3D11Texture2D* CreateNoiseD11Texture(ID3D11Device* device, const std::vector<u
     return texture;
 }
 
-ID3D11ShaderResourceView* LoadTextureFromPNG(const wchar_t* filePath, ID3D11Device* device, ID3D11DeviceContext* deviceContext)
+ID3D11ShaderResourceView* LoadTextureFromPNG(const wchar_t* filePath, ID3D11Device* device)
 {
     using Microsoft::WRL::ComPtr;
 

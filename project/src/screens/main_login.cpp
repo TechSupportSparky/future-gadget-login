@@ -1,6 +1,7 @@
 #include "main_login.h"
 
 #include "d3d_helpers.h"
+#include "globals.h"
 #include "imgui.h"
 #include "phone.h"
 #include <string>
@@ -8,7 +9,7 @@
 #include <vector>
 using namespace std;
 
-#define USABLE_CHARS 27
+#define USABLE_CHARS 36
 // DMails shouldn't look like gibberish, use natural phrases!
 // 36 Char MAX!
 vector<string> CaptchaPhrases = {
@@ -16,7 +17,7 @@ vector<string> CaptchaPhrases = {
     "D-Mail", "Reading_Steiner", "Attractor_Field",
     "Amadeus", "Shining_Finger", "Serial_Experiments",
     "Metal_Upa", "Stardust_Handshake", "Beta_Worldline",
-    "John_Titor", "RaiNet", "Faris_NyanNyan", "Gero_Froggy",
+    "John_Titor", "Faris_NyanNyan", "Gero_Froggy",
     "Whose_Eyes_Are_Those_Eyes", "Shibuya_Earthquake",
     "Neidhardt", "Gunvarrel", "Frau_Koujiro"
 };
@@ -28,6 +29,7 @@ string GetRandomCaptchaPhrase()
     return CaptchaPhrases[dist(rng)];
 }
 
+// Makes a noisy texture to mimic a captcha window to waste dumb bots time!
 void GenerateNoisyTexture(ID3D11ShaderResourceView*& noiseTextureView, ImVec2 imageSize)
 {
     int width = static_cast<int>(imageSize.x); int height = static_cast<int>(imageSize.y);
@@ -48,6 +50,7 @@ void GenerateNoisyTexture(ID3D11ShaderResourceView*& noiseTextureView, ImVec2 im
     }
 }
 
+// Draws the main viewport background (docking a texture)
 void DrawBackground(ID3D11ShaderResourceView* bgView)
 {
     ImGuiWindowFlags mainWindowFlags = ImGuiWindowFlags_NoDocking | ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoCollapse
@@ -75,14 +78,15 @@ void DrawBackground(ID3D11ShaderResourceView* bgView)
 }
 
 static bool isFadingIn = false;
+static bool signedIn = false; // Let us setup the background during transition
 bool ShowSuccessScreen()
 {
-    static float fadeAlpha = 0.05f;
+    static float fadeAlpha = 0.0f;
     static float holdTime = 3.0f;
 
     if (isFadingIn)
     {
-        fadeAlpha += ImGui::GetIO().DeltaTime * 0.5f;
+        fadeAlpha += ImGui::GetIO().DeltaTime * 0.25f;
 
         // Clamp zoomScale and fadeAlpha to their limits
         if (fadeAlpha > 1.0f) fadeAlpha = 1.0f;
@@ -105,7 +109,7 @@ bool ShowSuccessScreen()
         ImGui::SetWindowFocus(); // Need to force this on top
 
         static ID3D11ShaderResourceView* timeTravelTexture = nullptr;
-        if (!timeTravelTexture) timeTravelTexture = LoadTextureFromPNG(L"assets\\images\\DivergenceMeter.png", g_pd3dDevice, g_pd3dDeviceContext);
+        if (!timeTravelTexture) timeTravelTexture = LoadTextureFromPNG(L"assets\\images\\DivergenceMeter.png", g_pd3dDevice);
         ImGui::Image((void*)timeTravelTexture, viewportSize, ImVec2(0, 0), ImVec2(1, 1), ImVec4(1.0f, 1.0f, 1.0f, fadeAlpha));
 
         ImGui::End();
@@ -116,8 +120,10 @@ bool ShowSuccessScreen()
         if (fadeAlpha >= 1.0f)
         {
             waitTime += ImGui::GetIO().DeltaTime;
+
             if (waitTime > holdTime)
             {
+                signedIn = true;
                 // Reset vars in case we want to fade in again
                 isFadingIn = false;
                 fadeAlpha = 0.0f;  
@@ -129,6 +135,67 @@ bool ShowSuccessScreen()
     return false;
 }
 
+// This call updates the main login window to show a successful sign in
+void DrawSuccessfulLogin()
+{
+    static ID3D11ShaderResourceView* completeBackground = nullptr;
+    if (backgroundTexture != completeBackground)
+    {
+        if (backgroundTexture != nullptr)
+        {
+            backgroundTexture->Release(); // Cleanup your memory!
+            backgroundTexture = nullptr;
+        }
+        backgroundTexture = LoadTextureFromPNG(L"assets\\images\\GadetLab.png", g_pd3dDevice);
+        completeBackground = backgroundTexture; // Cache it
+    }
+
+    // Successfully logged in!
+    ImGui::PushStyleColor(ImGuiCol_Text, IM_COL32(0, 255, 0, 255)); // Set text color to green
+    ImGui::Text("You successfully logged in!");
+    ImGui::PopStyleColor(); // Revert text color to the default
+
+    static ID3D11ShaderResourceView* kurisuTexture = nullptr;
+    if (!kurisuTexture)
+    {
+        kurisuTexture = LoadTextureFromPNG(L"assets\\images\\KurisuThumbsUp.png", g_pd3dDevice);
+    }
+
+    // Image 
+    ImVec2 imageSize = ImVec2(250.0f, 141.0f); // Adjust as necessary for your image size
+
+    // Render the image directly below the text
+    ImGui::Image((void*)kurisuTexture, imageSize);
+}
+
+void SetupWindowCredentials()
+{
+    ImGuiViewport* viewport = ImGui::GetMainViewport();
+    ImVec2 initialPos = ImVec2(viewport->Pos.x + 25.0f, viewport->Pos.y + 25.0f);
+    ImGui::SetNextWindowPos(initialPos, ImGuiCond_Once);
+
+    ImVec2 minSize = ImVec2(400, 150); // Need a minimum size to include the entire titlebar
+    ImGui::SetNextWindowSizeConstraints(minSize, ImVec2(FLT_MAX, FLT_MAX));
+
+    // Titlebar and background colors
+    ImGui::PushStyleColor(ImGuiCol_TitleBg, IM_COL32(255, 143, 43, 245));
+    ImGui::PushStyleColor(ImGuiCol_TitleBgActive, IM_COL32(255, 143, 43, 245));
+    ImGui::PushStyleColor(ImGuiCol_WindowBg, IM_COL32(10, 0, 0, 255));
+    ImGui::PushStyleColor(ImGuiCol_Text, IM_COL32(0, 0, 0, 255));
+
+    ImGui::Begin("CONFIDENTIAL - FUTURE GADGET LABORATORY LOGIN", nullptr,
+        ImGuiWindowFlags_NoResize | ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoCollapse );
+    ImGui::PopStyleColor(4);
+
+    // Static username and passwords
+    ImGui::Text("Username:");
+    ImGui::BeginDisabled(true);
+    ImGui::InputText("##username", (char*)"KuriGohan", IM_ARRAYSIZE("KuriGohan"), ImGuiInputTextFlags_ReadOnly);
+
+    ImGui::Text("Password:");
+    ImGui::InputText("##password", (char*)"********", IM_ARRAYSIZE("********"), ImGuiInputTextFlags_ReadOnly);
+    ImGui::EndDisabled();
+}
 
 void ShowLoginScreen(bool& proceedToCaptcha, bool& triggerDmail)
 {
@@ -139,36 +206,11 @@ void ShowLoginScreen(bool& proceedToCaptcha, bool& triggerDmail)
     static float colorTimer = 0.0f;
     static bool successfullyLoggedIn = false;
     static bool successfulShift = false;
-    static bool signedIn = false;
 
-    // Size and position setup of login window
-    if (proceedToCaptcha)
-    {
-        ImVec2 expandedSize = ImVec2(600, 500); // For extra captcha space
-        ImGui::SetNextWindowSize(expandedSize, ImGuiCond_Always);
-    }
-    else
-    {
-        ImVec2 initialSize = ImVec2(600, 300);
-        ImGui::SetNextWindowSize(initialSize, ImGuiCond_Always);
-    }
-    ImVec2 initialPos = ImVec2(300, 100);
-    ImGui::SetNextWindowPos(initialPos, ImGuiCond_FirstUseEver);
-    
-    ImGui::Begin("CONFIDENTIAL - FUTURE GADGET LABORATORY LOGIN");
-    
-    // Static username and passwords
-    ImGui::Text("Username:");
-    ImGui::BeginDisabled(true);
-    ImGui::InputText("##username", (char*)"KuriGohan", IM_ARRAYSIZE("KuriGohan"), ImGuiInputTextFlags_ReadOnly);
-    
-    ImGui::Text("Password:");
-    ImGui::InputText("##password", (char*)"********", IM_ARRAYSIZE("********"), ImGuiInputTextFlags_ReadOnly);
-    ImGui::EndDisabled();
+    SetupWindowCredentials();
 
     if (!signedIn)
     {
-
         // Login Button, when clicked enter captcha
         if (ImGui::Button("Login"))
         {
@@ -182,8 +224,8 @@ void ShowLoginScreen(bool& proceedToCaptcha, bool& triggerDmail)
         {
             ImGui::Spacing();
             ImGui::Separator();
-            ImGui::Text("Supicious login location detected, identify lab member status with this CAPTCHA:");
-            ImVec2 captchaBoxSize = ImVec2(200.0f, 113.0f);
+            ImGui::Text("Supicious login location detected, identify lab member status with this CAPTCHA");
+            ImVec2 captchaBoxSize = ImVec2(300.0f, 113.0f);
             if (needNewCaptcha)
             {
                 captcha = GetRandomCaptchaPhrase();
@@ -196,8 +238,9 @@ void ShowLoginScreen(bool& proceedToCaptcha, bool& triggerDmail)
             // Incorrect text
             if (triggerDmail)
             {
+                memset(userCaptchaInput, 0, sizeof(userCaptchaInput));
                 ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(1.0f, 0.0f, 0.0f, 1.0f)); // Red text
-                ImGui::Text("Incorrect, the answer was: %s", captcha.c_str());
+                ImGui::Text("Incorrect, the previous answer was: %s", captcha.c_str());
                 ImGui::PopStyleColor();
             }
 
@@ -287,8 +330,6 @@ void ShowLoginScreen(bool& proceedToCaptcha, bool& triggerDmail)
                             phoneActivated = false;
                             proceedToCaptcha = false;
                             triggerDmail = false;
-
-                            signedIn = true;
                         }
                     }
                     else // Entered a captcha, but it did not trigger a world line shift
@@ -301,6 +342,10 @@ void ShowLoginScreen(bool& proceedToCaptcha, bool& triggerDmail)
                 }
             }
         }
+    }
+    else
+    {
+        DrawSuccessfulLogin();
     }
 
     ImGui::End();
