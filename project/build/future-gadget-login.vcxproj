@@ -184,6 +184,7 @@
     <Text Include="..\..\README.txt" />
   </ItemGroup>
   <ItemGroup>
+    <Image Include="..\assets\images\DivergenceMeter.png" />
     <Image Include="..\assets\images\FutureGadetLabHomepage.png" />
     <Image Include="..\assets\images\Phone.png" />
     <Image Include="..\assets\images\TimeTravelTexture.png" />

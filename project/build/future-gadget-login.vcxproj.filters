@@ -126,6 +126,9 @@
     <Image Include="..\assets\images\TimeTravelTexture.png">
       <Filter>assets\images</Filter>
     </Image>
+    <Image Include="..\assets\images\DivergenceMeter.png">
+      <Filter>assets\images</Filter>
+    </Image>
   </ItemGroup>
   <ItemGroup>
     <Font Include="..\assets\font\Garamond Light Condensed SSi Light Condensed.ttf">
