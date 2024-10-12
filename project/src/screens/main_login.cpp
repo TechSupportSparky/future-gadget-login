@@ -75,33 +75,21 @@ void DrawBackground(ID3D11ShaderResourceView* bgView)
 static bool isZooming = false;
 bool ShowSuccessScreen()
 {
-    static ID3D11ShaderResourceView* timeTravelTexture = nullptr;
-    static float zoomScale = 0.1f;
-    static float fadeAlpha = 0.0f;
-
-    if (!timeTravelTexture)
-    {
-        timeTravelTexture = LoadTextureFromPNG(L"assets\\images\\TimeTravelTexture.png", g_pd3dDevice, g_pd3dDeviceContext);
-    }
+    static float zoomScale = 0.05f;
+    static float holdTime = 3.0f;
 
     if (isZooming)
     {
         zoomScale += ImGui::GetIO().DeltaTime * 0.4f;
-        fadeAlpha += ImGui::GetIO().DeltaTime * 0.2f;
 
         // Clamp zoomScale and fadeAlpha to their limits
-        if (zoomScale > 1.0f)
-            zoomScale = 1.0f;
-        if (fadeAlpha > 1.0f)
-            fadeAlpha = 1.0f;
+        if (zoomScale > 1.0f) zoomScale = 1.0f;
 
         ImGuiViewport* viewport = ImGui::GetMainViewport();
         ImVec2 viewportCenter = ImVec2(viewport->Pos.x + viewport->Size.x * 0.5f, viewport->Pos.y + viewport->Size.y * 0.5f);
 
-        // Calculate image size based on zoom scale
+        // Calc size and position of the image
         ImVec2 imageSize = ImVec2(viewport->Size.x * zoomScale, viewport->Size.y * zoomScale);
-
-        // Calculate image position to keep it centered
         ImVec2 imagePos = ImVec2(viewportCenter.x - imageSize.x * 0.5f, viewportCenter.y - imageSize.y * 0.5f);
 
         // Attaching this to a separate window
@@ -119,30 +107,25 @@ bool ShowSuccessScreen()
         ImGui::Begin("Zoom Out", nullptr, windowFlags);
 
         // After adjusting the zoom and alpha, let's render
-        ImGui::Image((void*)timeTravelTexture, imageSize, ImVec2(0, 0), ImVec2(1, 1), ImVec4(1.0f, 1.0f, 1.0f, fadeAlpha));
+        static ID3D11ShaderResourceView* timeTravelTexture = nullptr;
+        if (!timeTravelTexture) timeTravelTexture = LoadTextureFromPNG(L"assets\\images\\TimeTravelTexture.png", g_pd3dDevice, g_pd3dDeviceContext);
+        ImGui::Image((void*)timeTravelTexture, imageSize, ImVec2(0, 0), ImVec2(1, 1), ImVec4(1.0f, 1.0f, 1.0f, 1.0f));
 
         ImGui::End();
         ImGui::PopStyleVar(3);
 
-        // Render the white fade effect
-        if (fadeAlpha > 0.0f)
+        // Once we've finished scaling, hold for a second then transition
+        static float waitTime = 0.0f;
+        if (zoomScale >= 1.0f)
         {
-            ImGui::SetNextWindowPos(viewport->Pos);
-            ImGui::SetNextWindowSize(viewport->Size);
-            ImGui::SetNextWindowBgAlpha(fadeAlpha);
-
-            ImGui::Begin("Fade to White Effect", nullptr, windowFlags);
-            ImGui::End();
-        }
-
-        // Stop the effect when fully faded in
-        if (fadeAlpha >= 1.0f)
-        {
-            isZooming = false;
-            zoomScale = 0.1f;
-            fadeAlpha = 0.0f;
-
-            return true;
+            waitTime += ImGui::GetIO().DeltaTime;
+            if (waitTime > holdTime)
+            {
+                isZooming = false;
+                zoomScale = 0.05f;
+                waitTime = 0.0f;
+                return true;
+            }
         }
     }
     return false;

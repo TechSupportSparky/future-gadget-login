@@ -44,20 +44,19 @@ void SetCaptchaStyles()
 
     if (phoneInputFont) ImGui::PushFont(phoneInputFont);
 
-    // Set custom colors for the input box
-    ImGui::PushStyleColor(ImGuiCol_FrameBg, ImVec4(1.0f, 1.0f, 1.0f, 1.0f));            // Background color (white)
-    ImGui::PushStyleColor(ImGuiCol_FrameBgHovered, ImVec4(0.95f, 0.95f, 0.95f, 1.0f));  // Slightly off-white when hovered
-    ImGui::PushStyleColor(ImGuiCol_FrameBgActive, ImVec4(0.9f, 0.9f, 0.9f, 1.0f));      // Slightly darker white when active (focused)
-    ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0.0f, 0.0f, 0.0f, 1.0f));               // Text color (black)
+    // Input box style
+    ImGui::PushStyleColor(ImGuiCol_FrameBg, ImVec4(1.0f, 1.0f, 1.0f, 1.0f));           
+    ImGui::PushStyleColor(ImGuiCol_FrameBgHovered, ImVec4(0.95f, 0.95f, 0.95f, 1.0f)); 
+    ImGui::PushStyleColor(ImGuiCol_FrameBgActive, ImVec4(0.9f, 0.9f, 0.9f, 1.0f));     
+    ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0.0f, 0.0f, 0.0f, 1.0f));              
 
-    // Push style for transparent button with black border
-    ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.0f, 0.0f, 0.0f, 0.0f));             // Transparent background
-    ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(0.0f, 0.0f, 0.0f, 0.1f));      // Slightly visible when hovered
-    ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4(0.0f, 0.0f, 0.0f, 0.2f));       // Slightly more visible when clicked
-    ImGui::PushStyleColor(ImGuiCol_Border, borderColor);                                // Pushing last to pop first
+    // Pulsing button color
+    ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.0f, 0.0f, 0.0f, 0.0f));            
+    ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(0.0f, 0.0f, 0.0f, 0.1f));     
+    ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4(0.0f, 0.0f, 0.0f, 0.2f));      
+    ImGui::PushStyleColor(ImGuiCol_Border, borderColor);                               
 
-    // Set custom style for border size
-    ImGui::PushStyleVar(ImGuiStyleVar_FrameBorderSize, 2.0f);                           // Border thickness
+    ImGui::PushStyleVar(ImGuiStyleVar_FrameBorderSize, 2.0f);                          
 }
 
 void CleanupCaptchaStyles()
