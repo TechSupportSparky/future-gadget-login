@@ -2,6 +2,7 @@
 
 #include "d3d_helpers.h"
 #include "imgui.h"
+#include "phone.h"
 #include <string>
 #include <random>
 #include <vector>
@@ -9,14 +10,14 @@ using namespace std;
 
 #define USABLE_CHARS 27
 // DMails shouldn't look like gibberish, use natural phrases!
-// 36 BYTES! "Captcha: " = 9 char + [27 characters]
+// 36 Char MAX!
 vector<string> CaptchaPhrases = {
     "LaurieWired", "Nullpo_GAH", "TimeLeap",
     "D-Mail", "Reading_Steiner", "Attractor_Field",
     "Amadeus", "Shining_Finger", "Serial_Experiments",
     "Metal_Upa", "Stardust_Handshake", "Beta_Worldline",
     "John_Titor", "RaiNet", "Faris_NyanNyan", "Gero_Froggy",
-    "Whose_Eyes_Are_Those_eyes", "Shibuya_Earthquake",
+    "Whose_Eyes_Are_Those_Eyes", "Shibuya_Earthquake",
     "Neidhardt", "Gunvarrel", "Frau_Koujiro"
 };
 
@@ -49,47 +50,115 @@ void GenerateNoisyTexture(ID3D11ShaderResourceView*& noiseTextureView, ImVec2 im
 
 void DrawBackground(ID3D11ShaderResourceView* bgView)
 {
-    ImVec2 screenSize = ImVec2(1920, 1080); // This should be 1920x1080 for fullscreen
+    ImGuiWindowFlags mainWindowFlags = ImGuiWindowFlags_NoDocking | ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoCollapse
+        | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoBringToFrontOnFocus | ImGuiWindowFlags_NoNavFocus;
+    ImGuiViewport* viewport = ImGui::GetMainViewport();
+    ImGui::SetNextWindowPos(viewport->Pos);
+    ImGui::SetNextWindowSize(viewport->Size);
+    ImGui::SetNextWindowViewport(viewport->ID);
+    ImGui::PushStyleVar(ImGuiStyleVar_WindowRounding, 0.0f);
+    ImGui::PushStyleVar(ImGuiStyleVar_WindowBorderSize, 0.0f);
+    ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0.0f, 0.0f));
+    mainWindowFlags |= ImGuiWindowFlags_NoBackground | ImGuiWindowFlags_NoDecoration;
+    ImGui::Begin("MainBackgroundWindow", nullptr, mainWindowFlags);
+    ImGui::PopStyleVar(3);
 
-    // Draw the background image over the entire screen
-    ImGui::SetNextWindowPos(ImVec2(0, 0), ImGuiCond_Always);
-    ImGui::SetNextWindowSize(screenSize, ImGuiCond_Always);
-
-    // Set flags to prevent user interaction
-    ImGuiWindowFlags windowFlags = ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoInputs | ImGuiWindowFlags_NoBringToFrontOnFocus;
-
-    ImGui::Begin("Background", nullptr, windowFlags);
-    ImGui::Image((void*)bgView, screenSize);
-    ImGui::End();
+    if (bgView)
+    {
+        ImVec2 screenSize = viewport->Size;
+        ImGui::Image((void*)bgView, screenSize);
+    }
+    ImGuiID dockspace_id = ImGui::GetID("MainDockSpace");
+    ImGui::DockSpace(dockspace_id, ImVec2(0.0f, 0.0f), ImGuiDockNodeFlags_None);
 }
 
-static ID3D11ShaderResourceView* PhoneTextureView = nullptr;
-void DrawPhone()
+static bool isZooming = false;
+bool ShowSuccessScreen()
 {
-    if (!PhoneTextureView) {
-        PhoneTextureView = LoadTextureFromPNG(L"C:\\Users\\TechS\\Downloads\\Phone.png", g_pd3dDevice, g_pd3dDeviceContext);
+    static ID3D11ShaderResourceView* timeTravelTexture = nullptr;
+    static float zoomScale = 0.1f;
+    static float fadeAlpha = 0.0f;
+
+    if (!timeTravelTexture)
+    {
+        timeTravelTexture = LoadTextureFromPNG(L"assets\\images\\TimeTravelTexture.png", g_pd3dDevice, g_pd3dDeviceContext);
     }
 
-    ImVec2 windowSize = ImVec2(300, 573);
-    ImGui::SetNextWindowSize(windowSize);
-    ImGui::SetNextWindowPos(ImVec2(0, 0), ImGuiCond_Always);
-    ImGuiStyle& style = ImGui::GetStyle();
-    style.WindowBorderSize = 0.0f; // Remove the window border
-    style.FrameBorderSize = 0.0f;
-    ImGui::SetNextWindowBgAlpha(0.0f);
+    if (isZooming)
+    {
+        zoomScale += ImGui::GetIO().DeltaTime * 0.4f;
+        fadeAlpha += ImGui::GetIO().DeltaTime * 0.2f;
 
-    ImGuiWindowFlags windowFlags = ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize /* | ImGuiWindowFlags_NoMove */ |
-        ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse;
+        // Clamp zoomScale and fadeAlpha to their limits
+        if (zoomScale > 1.0f)
+            zoomScale = 1.0f;
+        if (fadeAlpha > 1.0f)
+            fadeAlpha = 1.0f;
 
-    ImGui::Begin("Phone Window", nullptr, windowFlags);
-    ImGui::Image((void*)PhoneTextureView, windowSize);
+        ImGuiViewport* viewport = ImGui::GetMainViewport();
+        ImVec2 viewportCenter = ImVec2(viewport->Pos.x + viewport->Size.x * 0.5f, viewport->Pos.y + viewport->Size.y * 0.5f);
+
+        // Calculate image size based on zoom scale
+        ImVec2 imageSize = ImVec2(viewport->Size.x * zoomScale, viewport->Size.y * zoomScale);
+
+        // Calculate image position to keep it centered
+        ImVec2 imagePos = ImVec2(viewportCenter.x - imageSize.x * 0.5f, viewportCenter.y - imageSize.y * 0.5f);
+
+        // Attaching this to a separate window
+        ImGui::SetNextWindowPos(imagePos);
+        ImGui::SetNextWindowSize(imageSize);
+        ImGui::SetNextWindowBgAlpha(0.0f);
+
+        ImGuiWindowFlags windowFlags = ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoMove |
+            ImGuiWindowFlags_NoBringToFrontOnFocus | ImGuiWindowFlags_NoResize |
+            ImGuiWindowFlags_NoNavFocus | ImGuiWindowFlags_NoInputs;
+
+        ImGui::PushStyleVar(ImGuiStyleVar_WindowRounding, 0.0f);
+        ImGui::PushStyleVar(ImGuiStyleVar_WindowBorderSize, 0.0f);
+        ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0.0f, 0.0f));
+        ImGui::Begin("Zoom Out", nullptr, windowFlags);
+
+        // After adjusting the zoom and alpha, let's render
+        ImGui::Image((void*)timeTravelTexture, imageSize, ImVec2(0, 0), ImVec2(1, 1), ImVec4(1.0f, 1.0f, 1.0f, fadeAlpha));
+
+        ImGui::End();
+        ImGui::PopStyleVar(3);
+
+        // Render the white fade effect
+        if (fadeAlpha > 0.0f)
+        {
+            ImGui::SetNextWindowPos(viewport->Pos);
+            ImGui::SetNextWindowSize(viewport->Size);
+            ImGui::SetNextWindowBgAlpha(fadeAlpha);
+
+            ImGui::Begin("Fade to White Effect", nullptr, windowFlags);
+            ImGui::End();
+        }
+
+        // Stop the effect when fully faded in
+        if (fadeAlpha >= 1.0f)
+        {
+            isZooming = false;
+            zoomScale = 0.1f;
+            fadeAlpha = 0.0f;
+
+            return true;
+        }
+    }
+    return false;
 }
 
-void ShowLoginScreen(bool& showLoginScreen, bool& proceedToCaptcha, bool& triggerDmail)
+
+void ShowLoginScreen(bool& proceedToCaptcha, bool& triggerDmail)
 {
     static ID3D11ShaderResourceView* noiseTextureView = nullptr;
     static string captcha = "";
     static bool needNewCaptcha = false;
+
+    static float colorTimer = 0.0f;
+    static bool successfullyLoggedIn = false;
+    static bool successfulShift = false;
+    static bool signedIn = false;
 
     // Size and position setup of login window
     if (proceedToCaptcha)
@@ -107,7 +176,7 @@ void ShowLoginScreen(bool& showLoginScreen, bool& proceedToCaptcha, bool& trigge
     
     ImGui::Begin("CONFIDENTIAL - FUTURE GADGET LABORATORY LOGIN");
     
-    // Username and password fields (non-editable)
+    // Static username and passwords
     ImGui::Text("Username:");
     ImGui::BeginDisabled(true);
     ImGui::InputText("##username", (char*)"KuriGohan", IM_ARRAYSIZE("KuriGohan"), ImGuiInputTextFlags_ReadOnly);
@@ -158,7 +227,6 @@ void ShowLoginScreen(bool& showLoginScreen, bool& proceedToCaptcha, bool& trigge
             {
                 // They guessed it?!
                 proceedToCaptcha = false;
-                showLoginScreen = false;
 
                 // Clear up the captcha texture
                 if (noiseTextureView != nullptr)
@@ -189,22 +257,62 @@ void ShowLoginScreen(bool& showLoginScreen, bool& proceedToCaptcha, bool& trigge
     if (triggerDmail)
     {
         static bool phoneActivated = false;
-        if (ImGui::Button("Phone"))
-        {
-            phoneActivated = true;
+
+        // Pulse the phone activate button until they click it
+        if (!phoneActivated) {
+            colorTimer += ImGui::GetIO().DeltaTime * 1.0f;
+            float colorIntensity = (sin(colorTimer) + 1.0f) * 0.3f;  // Oscillates 0-1
+
+            // Should probably store these off, but we're out of here once they click
+            ImVec4 blueColor = ImVec4(42.0f / 255.0f, 74.0f / 255.0f, 114.0f / 255.0f, 1.0f);
+            ImVec4 goldColor = ImVec4(255.0f / 255.0f, 215.0f / 255.0f, 0.0f / 255.0f, 1.0f);
+
+            ImVec4 buttonColor = ImVec4(
+                blueColor.x + (goldColor.x - blueColor.x) * colorIntensity,
+                blueColor.y + (goldColor.y - blueColor.y) * colorIntensity,
+                blueColor.z + (goldColor.z - blueColor.z) * colorIntensity,
+                1.0f
+            );
+
+            ImGui::PushStyleColor(ImGuiCol_Button, buttonColor);
+            ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(buttonColor.x + 0.1f, buttonColor.y + 0.1f, buttonColor.z + 0.1f, buttonColor.w));
+            ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4(buttonColor.x - 0.1f, buttonColor.y - 0.1f, buttonColor.z - 0.1f, buttonColor.w));
+
+            if (ImGui::Button("Phone"))
+            {
+                phoneActivated = true;
+            }
+
+            ImGui::PopStyleColor(3);
         }
 
+        // Callup the phone and wait on a response
         if (phoneActivated)
         {
-            DrawPhone();
-
-            // Set position for input box to overlay on the phone screen section
-            ImGui::SetCursorPos(ImVec2(60, 220)); // Adjust to match the black screen area
-            static char inputBuffer[128] = "";
-            ImGui::InputText("##phone_input", inputBuffer, IM_ARRAYSIZE(inputBuffer));
-
-
-            ImGui::End();
+            // Wait for phone flags
+            bool sentDmail = DrawPhone(captcha, successfulShift);
+            if (sentDmail)
+            {
+                // They successfully entered in the right captcha
+                if (successfulShift) {
+                    isZooming = true;
+                    if (ShowSuccessScreen()) // Wait until the animation finishes
+                    {
+                        // Reset phone and captcha windows
+                        ResetPhone();
+                        phoneActivated = false;
+                        proceedToCaptcha = false; 
+                        triggerDmail = false;
+                    }
+                }
+                else // Entered a captcha, but it did not trigger a world line shift
+                {
+                    ResetPhone();
+                    phoneActivated = false;
+                    proceedToCaptcha = false; 
+                    triggerDmail = false;
+                }
+            }
         }
     }
 

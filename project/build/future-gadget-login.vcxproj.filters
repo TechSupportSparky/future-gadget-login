@@ -16,6 +16,18 @@
     <Filter Include="sources\lib_helpers\imgui_impl">
       <UniqueIdentifier>{34ebb7b5-3306-43d2-877a-be8b120e171c}</UniqueIdentifier>
     </Filter>
+    <Filter Include="assets">
+      <UniqueIdentifier>{f15d96c7-849c-4dd5-9589-ac7787524b9c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="assets\images">
+      <UniqueIdentifier>{b45d7583-c82c-4dfc-8ca7-cec08ee7c7c2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="assets\font">
+      <UniqueIdentifier>{7885b078-227f-4c6b-b3d7-25dc74de5635}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="assets\audio">
+      <UniqueIdentifier>{4287620f-a626-4f63-8993-70fde1d971b5}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\imconfig.h">
@@ -47,6 +59,12 @@
     </ClInclude>
     <ClInclude Include="..\..\backends\imgui.h">
       <Filter>imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\screens\phone.h">
+      <Filter>sources\screens</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\lib_helpers\globals.h">
+      <Filter>sources\lib_helpers</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -83,6 +101,9 @@
     <ClCompile Include="..\src\main.cpp">
       <Filter>sources</Filter>
     </ClCompile>
+    <ClCompile Include="..\src\screens\phone.cpp">
+      <Filter>sources\screens</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\..\misc\debuggers\imgui.natvis">
@@ -94,5 +115,26 @@
   </ItemGroup>
   <ItemGroup>
     <Text Include="..\..\README.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="..\assets\images\FutureGadetLabHomepage.png">
+      <Filter>assets\images</Filter>
+    </Image>
+    <Image Include="..\assets\images\Phone.png">
+      <Filter>assets\images</Filter>
+    </Image>
+    <Image Include="..\assets\images\TimeTravelTexture.png">
+      <Filter>assets\images</Filter>
+    </Image>
+  </ItemGroup>
+  <ItemGroup>
+    <Font Include="..\assets\font\Garamond Light Condensed SSi Light Condensed.ttf">
+      <Filter>assets\font</Filter>
+    </Font>
+  </ItemGroup>
+  <ItemGroup>
+    <Media Include="..\assets\audio\ReadingSteinerEffect.wav">
+      <Filter>assets\audio</Filter>
+    </Media>
   </ItemGroup>
 </Project>

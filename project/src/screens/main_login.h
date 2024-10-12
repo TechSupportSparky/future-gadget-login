@@ -11,6 +11,6 @@
 struct ID3D11ShaderResourceView;
 
 // Main logic
-void ShowLoginScreen(bool& showLoginScreen, bool& proceedToCaptcha, bool& triggerDmail);
+void ShowLoginScreen(bool& proceedToCaptcha, bool& triggerDmail);
 
 void DrawBackground(ID3D11ShaderResourceView* bgView);

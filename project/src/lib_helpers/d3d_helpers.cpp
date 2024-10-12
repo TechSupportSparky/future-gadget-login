@@ -92,15 +92,22 @@ bool D3DHandleWindowEvents()
 // Initializes and creates the viewport, returns non-zero if we failed to create the window
 int CreateD3DWindow(WNDCLASSEXW& outWc, HWND& outHandle)
 {
-    // Window parameters
+    const int width = 1600; const int height = 900;
+
+    // This PCs dimensions
+    int screenWidth = GetSystemMetrics(SM_CXSCREEN); int screenHeight = GetSystemMetrics(SM_CYSCREEN);
+
+    // Window setup
+    int xPos = (screenWidth - width) / 2;
+    int yPos = (screenHeight - height) / 2;
     outWc = { sizeof(outWc), CS_CLASSDC, WndProc, 0L, 0L, GetModuleHandle(nullptr), nullptr, nullptr, nullptr, nullptr, L"ImGui Example", nullptr };
     ::RegisterClassExW(&outWc);
-    //outHandle = ::CreateWindowW(outWc.lpszClassName, L"Dear ImGui DirectX11 Example", WS_OVERLAPPEDWINDOW, 100, 100, width, height, nullptr, nullptr, outWc.hInstance, nullptr);
+
     outHandle = ::CreateWindowW(
         outWc.lpszClassName,
         L"Future Gadget Lab Fullscreen Window",
-        WS_POPUP | WS_VISIBLE,                   // Use WS_POPUP and WS_VISIBLE to cover the entire screen without borders
-        0, 0, 1920, 1080,                        // Fullscreen size (1920x1080)
+        WS_OVERLAPPEDWINDOW | WS_VISIBLE,
+        xPos, yPos, width, height,
         nullptr, nullptr, outWc.hInstance, nullptr
     );
 
@@ -114,7 +121,6 @@ int CreateD3DWindow(WNDCLASSEXW& outWc, HWND& outHandle)
 
     // Show the window
     ::ShowWindow(outHandle, SW_SHOWDEFAULT);
-    //::ShowWindow(outHandle, SW_HIDE);
     ::UpdateWindow(outHandle);
 
     return 0;
