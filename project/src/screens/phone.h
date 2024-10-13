@@ -6,7 +6,6 @@
 // AKA Future Labratory Gadget No. 17
 // AKA International World Line Communication Device
 //
-//
 // Copyright (c) FG16, DaSH (￣ー￣)
 // ****************************************************
 

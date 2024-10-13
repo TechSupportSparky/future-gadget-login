@@ -24,7 +24,7 @@ using namespace std;
 // We could use random characters for our captcha, but what's
 // the fun in that ( ◞･౪･)
 vector<string> CaptchaPhrases = {
-    "LaurieWired", "Nullpo_GAH", "TimeLeap",
+    "LaurieWired", "Nullpo_GAH", "Tutturu", "TimeLeap",
     "D-Mail", "Reading_Steiner", "Attractor_Field",
     "Amadeus", "Shining_Finger", "Serial_Experiments",
     "Metal_Upa", "Stardust_Handshake", "Beta_Worldline",
@@ -40,6 +40,15 @@ string GetRandomCaptchaPhrase()
     return CaptchaPhrases[dist(rng)];
 }
 
+// Mayuri said it was too hard to match the words so I'll make
+// the phrases case insensitive m(. .)m
+string ToLowerCase(const string& str)
+{
+    string result = str;
+    transform(result.begin(), result.end(), result.begin(),
+        [](unsigned char c) { return static_cast<unsigned char>(tolower(c)); });
+    return result;
+}
 
 // Draws the main viewport background (docking a texture)
 void DrawBackground(ID3D11ShaderResourceView* bgView)
@@ -187,17 +196,17 @@ void SetupWindowCredentials()
         ImGuiWindowFlags_NoResize | ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoCollapse );
     ImGui::PopStyleColor(4);
 
-    // Static username and passwords
+    // For demo purposes! We'll use Kurisu's login fufu
     ImGui::Text("Username:");
     ImGui::BeginDisabled(true);
     ImGui::InputText("##username", (char*)"KuriGohan", IM_ARRAYSIZE("KuriGohan"), ImGuiInputTextFlags_ReadOnly);
 
-    ImGui::Text("Password:");
-    ImGui::InputText("##password", (char*)"********", IM_ARRAYSIZE("********"), ImGuiInputTextFlags_ReadOnly);
+    ImGui::Text("Password:"); // ********** = Kamehameha (^_−)☆
+    ImGui::InputText("##password", (char*)"**********", IM_ARRAYSIZE("**********"), ImGuiInputTextFlags_ReadOnly);
     ImGui::EndDisabled();
 }
 
-// 
+// Main logic!
 void ShowLoginScreen()
 {
     static ID3D11ShaderResourceView* noiseTextureView = nullptr;
@@ -252,7 +261,7 @@ void ShowLoginScreen()
             // give them the phone trigger
             if (ImGui::Button("Verify"))
             {
-                if (captcha == string(userCaptchaInput))
+                if (ToLowerCase(captcha) == ToLowerCase(string(userCaptchaInput)))
                 {
                     // They guessed it?! ಠ_ಠ
                     proceedToCaptcha = false;

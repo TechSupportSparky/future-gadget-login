@@ -113,12 +113,10 @@
       <SubSystem>Windows</SubSystem>
     </Link>
     <PostBuildEvent>
-      <Command>robocopy "$(ProjectDir)\..\assets" "$(TargetDir)assets" /E /NDL /NFL /NJH /NJS
-del  /Q "$(TargetDir)*.obj"
-del  /Q "$(TargetDir)*.pdb"
-del  /Q "$(TargetDir)*.ilk"
-del  /Q "$(TargetDir)*.recipe"
-if %ERRORLEVEL% LSS 8 exit 0</Command>
+      <Command>if not exist "$(TargetDir)\build" (mkdir "$(TargetDir)\build")
+robocopy "$(ProjectDir)\..\assets" "$(TargetDir)\build\assets" /E /NDL /NFL /NJH /NJS
+copy /Y "$(TargetPath)" "$(TargetDir)\build\"
+if %ERRORLEVEL% NEQ 0 exit %ERRORLEVEL%</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -160,12 +158,10 @@ if %ERRORLEVEL% LSS 8 exit 0</Command>
       <SubSystem>Windows</SubSystem>
     </Link>
     <PostBuildEvent>
-      <Command>robocopy "$(ProjectDir)\..\assets" "$(TargetDir)assets" /E /NDL /NFL /NJH /NJS
-del  /Q "$(TargetDir)*.obj"
-del  /Q "$(TargetDir)*.pdb"
-del  /Q "$(TargetDir)*.ilk"
-del  /Q "$(TargetDir)*.recipe"
-if %ERRORLEVEL% LSS 8 exit 0</Command>
+      <Command>if not exist "$(TargetDir)\build" (mkdir "$(TargetDir)\build")
+robocopy "$(ProjectDir)\..\assets" "$(TargetDir)\build\assets" /E /NDL /NFL /NJH /NJS
+copy /Y "$(TargetPath)" "$(TargetDir)\build\"
+if %ERRORLEVEL% NEQ 0 exit %ERRORLEVEL%</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>

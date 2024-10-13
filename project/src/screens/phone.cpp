@@ -2,8 +2,9 @@
 
 #include "d3d_helpers.h"
 #include "d3d11.h"
-#include "imgui.h"
 #include "globals.h"
+#include "imgui.h"
+#include "main_login.h"
 
 // ****************************************************
 // The purpose of Gadget No. 17 is to have a permanent
@@ -116,7 +117,8 @@ bool DrawPhone(string captcha, bool& successfulShift)
 
             // Okabe says only those with reading steiner can detect when
             // the worldline has shifted, but none of us really feel it (゜-゜)
-            if (captcha == string(phoneInputBuffer))
+            // I'll just have to assume this works lol
+            if (ToLowerCase(captcha) == ToLowerCase(string(phoneInputBuffer)))
             {
                 successfulShift = true;
                 PlaySound(L"assets\\audio\\ReadingSteinerEffect.wav", nullptr, SND_FILENAME | SND_ASYNC);
