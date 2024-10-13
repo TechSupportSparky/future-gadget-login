@@ -1,5 +1,5 @@
 # Future-Gadget-Login
-*Laurie Wired 2024 Halloween Programming Challenge*
+*Laurie Wired 2024 Halloween [Programming Challenge](https://github.com/LaurieWired/Halloween_2024_Programming_Challenge)*
 
 The admin page of the Future Gadget Labratory Homepage serves as the only barrier between our confidential secrets and nefarious entities.  Daru has devised an ingenious captcha system using existing laboratory technology to not only stop bots from sneaking in, but even non-lab members too!
 
