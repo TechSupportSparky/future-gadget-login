@@ -6,7 +6,7 @@ The admin page of the Future Gadget Labratory Homepage serves as the only barrie
 ## Installation 🖥️
 I've tried to make this process as simple as possible, thus I've zipped up the binary which you can download [here](https://github.com/TechSupportSparky/future-gadget-login/releases/tag/Release). The runtime library has been statically linked so there should be no prerequisite installs!
 
-## Problems installing? ❓
+## Problems installing? 😕
 If for any reason there is an issue getting this program to work, I've also provided a [YouTube video](https://youtu.be/wtIMgLiwVPI) of what it looks like to log into our system.  This can also serve as a walkthrough if anyone gets stuck on how to proceed!
 
 ## Credits 🙇
