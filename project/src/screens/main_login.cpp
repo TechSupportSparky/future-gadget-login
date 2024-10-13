@@ -37,7 +37,12 @@ string GetRandomCaptchaPhrase()
 {
     static mt19937 rng(random_device{}());
     uniform_int_distribution<size_t> dist(0, CaptchaPhrases.size() - 1);
-    return CaptchaPhrases[dist(rng)];
+    string phrase = CaptchaPhrases[dist(rng)];
+
+    // Add a _0000 number at the end to prevent spamming ヽ(`Д´)ﾉ
+    uniform_int_distribution<int> num_dist(1000, 9999);
+    int random_number = num_dist(rng);
+    return phrase + "_" + to_string(random_number);
 }
 
 // Mayuri said it was too hard to match the words so I'll make
