@@ -10,10 +10,11 @@
 
 //****************************************************
 //
-// Our login window is uncrackable! ... if we host
-// this logic on the site and don't provide an exe
-// (*´_ゝ｀) We should probably lock out the users too
-// but Okarin wants this done yesterday 
+// Our login window is uncrackable! In combination of
+// D-Mail and our fixed phone 2-factor capcha system,
+// only lab members will be able to log into our system
+// and bots will spend hundreds of thousands of yen trying
+// to solve noise, Mwahahahaha! (￢‿￢ )
 // 
 //****************************************************
 
@@ -92,6 +93,8 @@ bool ShowSuccessScreen()
         ImGuiViewport* viewport = ImGui::GetMainViewport();
         ImVec2 viewportSize = viewport->Size;
 
+        // I don't like having these large style dumps, but I'm trying
+        // to avoid having a bunch of specialized style functions, sowwy! (ﾉ∀`)
         ImGui::SetNextWindowPos(viewport->Pos);
         ImGui::SetNextWindowSize(viewportSize);
         ImGui::SetNextWindowBgAlpha(0.0f);
