@@ -1,4 +1,4 @@
-#include "main_login.h"
+﻿#include "main_login.h"
 
 #include "d3d_helpers.h"
 #include "globals.h"
@@ -7,11 +7,21 @@
 #include <string>
 #include <random>
 #include <vector>
+
+//****************************************************
+//
+// Our login window is uncrackable! ... if we host
+// this logic on the site and don't provide an exe
+// (*´_ゝ｀) We should probably lock out the users too
+// but Okarin wants this done yesterday 
+// 
+//****************************************************
+
 using namespace std;
 
 #define USABLE_CHARS 36
-// DMails shouldn't look like gibberish, use natural phrases!
-// 36 Char MAX!
+// We could use random characters for our captcha, but what's
+// the fun in that ( ◞･౪･)
 vector<string> CaptchaPhrases = {
     "LaurieWired", "Nullpo_GAH", "TimeLeap",
     "D-Mail", "Reading_Steiner", "Attractor_Field",
@@ -29,30 +39,11 @@ string GetRandomCaptchaPhrase()
     return CaptchaPhrases[dist(rng)];
 }
 
-// Makes a noisy texture to mimic a captcha window to waste dumb bots time!
-void GenerateNoisyTexture(ID3D11ShaderResourceView*& noiseTextureView, ImVec2 imageSize)
-{
-    int width = static_cast<int>(imageSize.x); int height = static_cast<int>(imageSize.y);
-
-    // Clear out any data currently in this pointer ref 
-    if (noiseTextureView != nullptr)
-    {
-        noiseTextureView->Release(); 
-        noiseTextureView = nullptr;
-    }
-
-    auto noiseData = GenerateNoiseData(width, height);
-    ID3D11Texture2D* noiseTexture = CreateNoiseD11Texture(g_pd3dDevice, noiseData, width, height);
-    if (noiseTexture)
-    {
-        noiseTextureView = CreateShaderResourceView(g_pd3dDevice, noiseTexture);
-        noiseTexture->Release();  // Release the texture object after creating the view
-    }
-}
 
 // Draws the main viewport background (docking a texture)
 void DrawBackground(ID3D11ShaderResourceView* bgView)
 {
+    // We don't want any of that imgui UI ( ╯°□°)╯ ┻━━┻ <--- ImGUI decorations
     ImGuiWindowFlags mainWindowFlags = ImGuiWindowFlags_NoDocking | ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoCollapse
         | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoBringToFrontOnFocus | ImGuiWindowFlags_NoNavFocus;
     ImGuiViewport* viewport = ImGui::GetMainViewport();
@@ -66,6 +57,8 @@ void DrawBackground(ID3D11ShaderResourceView* bgView)
 
     mainWindowFlags |= ImGuiWindowFlags_NoBackground | ImGuiWindowFlags_NoDecoration;
     ImGui::Begin("MainBackgroundWindow", nullptr, mainWindowFlags);
+
+    // (╮°-°)╮┳━━┳ but we do need to pop our changes
     ImGui::PopStyleVar(3);
 
     if (bgView)
@@ -75,15 +68,20 @@ void DrawBackground(ID3D11ShaderResourceView* bgView)
     }
     ImGuiID dockspace_id = ImGui::GetID("MainDockSpace");
     ImGui::DockSpace(dockspace_id, ImVec2(0.0f, 0.0f), ImGuiDockNodeFlags_None);
+
+    ImGui::End();
 }
 
 static bool isFadingIn = false;
-static bool signedIn = false; // Let us setup the background during transition
+static bool signedIn = false;
 bool ShowSuccessScreen()
 {
     static float fadeAlpha = 0.0f;
     static float holdTime = 3.0f;
 
+    // ( ・・)つ-●●● Slowly display a divergence meter to indicate
+    // we've time traveled (was going to blur and imitate Okarin's reading
+    // steiner but I had trouble with that (´-ω-)
     if (isFadingIn)
     {
         fadeAlpha += ImGui::GetIO().DeltaTime * 0.25f;
@@ -106,7 +104,7 @@ bool ShowSuccessScreen()
         ImGui::PushStyleVar(ImGuiStyleVar_WindowBorderSize, 0.0f);
         ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0.0f, 0.0f));
         ImGui::Begin("Fade In Effect", nullptr, windowFlags);
-        ImGui::SetWindowFocus(); // Need to force this on top
+        ImGui::SetWindowFocus(); // Need to force this on top 
 
         static ID3D11ShaderResourceView* timeTravelTexture = nullptr;
         if (!timeTravelTexture) timeTravelTexture = LoadTextureFromPNG(L"assets\\images\\DivergenceMeter.png", g_pd3dDevice);
@@ -115,7 +113,8 @@ bool ShowSuccessScreen()
         ImGui::End();
         ImGui::PopStyleVar(3);
 
-        // Once we've finished scaling, hold for a second then transition
+        // Once we've finished scaling, hold for a few seconds then transition
+        // (－ω－) zzZ
         static float waitTime = 0.0f;
         if (fadeAlpha >= 1.0f)
         {
@@ -138,33 +137,31 @@ bool ShowSuccessScreen()
 // This call updates the main login window to show a successful sign in
 void DrawSuccessfulLogin()
 {
+    // Change the background to celebrate the login! ＼(＾▽＾)／
     static ID3D11ShaderResourceView* completeBackground = nullptr;
     if (backgroundTexture != completeBackground)
     {
         if (backgroundTexture != nullptr)
         {
-            backgroundTexture->Release(); // Cleanup your memory!
+            backgroundTexture->Release(); // Cleanup your memory! 
             backgroundTexture = nullptr;
         }
         backgroundTexture = LoadTextureFromPNG(L"assets\\images\\GadetLab.png", g_pd3dDevice);
-        completeBackground = backgroundTexture; // Cache it
+        completeBackground = backgroundTexture; // Cache it! φ(．．)
     }
 
-    // Successfully logged in!
-    ImGui::PushStyleColor(ImGuiCol_Text, IM_COL32(0, 255, 0, 255)); // Set text color to green
+    // Victory text before pushing them to the administrator section
+    ImGui::PushStyleColor(ImGuiCol_Text, IM_COL32(0, 255, 0, 255)); // gel-nana green
     ImGui::Text("You successfully logged in!");
-    ImGui::PopStyleColor(); // Revert text color to the default
+    ImGui::PopStyleColor();
 
+    // („• ᴗ •„) Draw Kurisu with successful login
     static ID3D11ShaderResourceView* kurisuTexture = nullptr;
     if (!kurisuTexture)
     {
         kurisuTexture = LoadTextureFromPNG(L"assets\\images\\KurisuThumbsUp.png", g_pd3dDevice);
     }
-
-    // Image 
-    ImVec2 imageSize = ImVec2(250.0f, 141.0f); // Adjust as necessary for your image size
-
-    // Render the image directly below the text
+    ImVec2 imageSize = ImVec2(250.0f, 141.0f);
     ImGui::Image((void*)kurisuTexture, imageSize);
 }
 
@@ -197,21 +194,20 @@ void SetupWindowCredentials()
     ImGui::EndDisabled();
 }
 
-void ShowLoginScreen(bool& proceedToCaptcha, bool& triggerDmail)
+// 
+void ShowLoginScreen()
 {
     static ID3D11ShaderResourceView* noiseTextureView = nullptr;
     static string captcha = "";
-    static bool needNewCaptcha = false;
-
     static float colorTimer = 0.0f;
-    static bool successfullyLoggedIn = false;
-    static bool successfulShift = false;
 
     SetupWindowCredentials();
 
     if (!signedIn)
     {
         // Login Button, when clicked enter captcha
+        static bool proceedToCaptcha = false;
+        static bool needNewCaptcha = false;
         if (ImGui::Button("Login"))
         {
             proceedToCaptcha = true;
@@ -220,8 +216,10 @@ void ShowLoginScreen(bool& proceedToCaptcha, bool& triggerDmail)
 
         // Captcha flow
         static char userCaptchaInput[USABLE_CHARS] = "";
+        static bool triggerDmail = false;
         if (proceedToCaptcha)
         {
+            // Making the fake captcha box to trick any bots trying to sneak in （；¬＿¬)
             ImGui::Spacing();
             ImGui::Separator();
             ImGui::Text("Supicious login location detected, identify lab member status with this CAPTCHA");
@@ -235,7 +233,10 @@ void ShowLoginScreen(bool& proceedToCaptcha, bool& triggerDmail)
             }
             ImGui::Image((void*)noiseTextureView, captchaBoxSize);
 
-            // Incorrect text
+            // Verify that captcha box (>ᴗ•)
+            ImGui::InputText("##captcha_input", userCaptchaInput, IM_ARRAYSIZE(userCaptchaInput));
+
+            // Incorrect text, give lab mems a little hint (っ╹ᆺ╹)っ
             if (triggerDmail)
             {
                 memset(userCaptchaInput, 0, sizeof(userCaptchaInput));
@@ -244,15 +245,13 @@ void ShowLoginScreen(bool& proceedToCaptcha, bool& triggerDmail)
                 ImGui::PopStyleColor();
             }
 
-            // Input box
-            ImGui::InputText("##captcha_input", userCaptchaInput, IM_ARRAYSIZE(userCaptchaInput));
-
-            // Logic for when we click verify
+            // When we click verify (did they guess the right answer?) if not,
+            // give them the phone trigger
             if (ImGui::Button("Verify"))
             {
                 if (captcha == string(userCaptchaInput))
                 {
-                    // They guessed it?!
+                    // They guessed it?! ಠ_ಠ
                     proceedToCaptcha = false;
 
                     // Clear up the captcha texture
@@ -261,10 +260,15 @@ void ShowLoginScreen(bool& proceedToCaptcha, bool& triggerDmail)
                         noiseTextureView->Release();
                         noiseTextureView = nullptr;
                     }
+
+                    // Push the SUPAH HACKA to the success
+                    // m(_ _)m (this is how I get in fufu (￣ω￣;) )
+                    signedIn = true;
+                    DrawSuccessfulLogin();
                 }
                 else
                 {
-                    // Trigger phone logic!
+                    // Trigger phone logic (∩｀-´)⊃━━☆ﾟ.･｡ﾟ
                     needNewCaptcha = true;
                     triggerDmail = true;
                 }
@@ -280,17 +284,20 @@ void ShowLoginScreen(bool& proceedToCaptcha, bool& triggerDmail)
                 ImGui::EndTooltip();
             }
         }
-
+        // "Phone" button trigger
         if (triggerDmail)
         {
             static bool phoneActivated = false;
 
-            // Pulse the phone activate button until they click it
+            // Pulse the phone activate button until they click it 
             if (!phoneActivated) {
+                ImGui::SameLine();
+                ImGui::Text(" | ");
+
                 colorTimer += ImGui::GetIO().DeltaTime * 1.0f;
                 float colorIntensity = (sin(colorTimer) + 1.0f) * 0.3f;  // Oscillates 0-1
 
-                // Should probably store these off, but we're out of here once they click
+                // Should probably store these off but bah, we'll stop when they click away ┐(‘～ )┌
                 ImVec4 blueColor = ImVec4(42.0f / 255.0f, 74.0f / 255.0f, 114.0f / 255.0f, 1.0f);
                 ImVec4 goldColor = ImVec4(255.0f / 255.0f, 215.0f / 255.0f, 0.0f / 255.0f, 1.0f);
 
@@ -304,7 +311,7 @@ void ShowLoginScreen(bool& proceedToCaptcha, bool& triggerDmail)
                 ImGui::PushStyleColor(ImGuiCol_Button, buttonColor);
                 ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(buttonColor.x + 0.1f, buttonColor.y + 0.1f, buttonColor.z + 0.1f, buttonColor.w));
                 ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4(buttonColor.x - 0.1f, buttonColor.y - 0.1f, buttonColor.z - 0.1f, buttonColor.w));
-
+                ImGui::SameLine();
                 if (ImGui::Button("Phone"))
                 {
                     phoneActivated = true;
@@ -317,13 +324,15 @@ void ShowLoginScreen(bool& proceedToCaptcha, bool& triggerDmail)
             if (phoneActivated)
             {
                 // Wait for phone flags
+                static bool successfulShift = false;
                 bool sentDmail = DrawPhone(captcha, successfulShift);
                 if (sentDmail)
                 {
-                    // They successfully entered in the right captcha
+                    // They successfully entered in the right captcha ( ´ ▿ )
                     if (successfulShift) {
                         isFadingIn = true;
-                        if (ShowSuccessScreen()) // Wait until the animation finishes
+                        // Wait until the animation finishes
+                        if (ShowSuccessScreen()) 
                         {
                             // Reset phone and captcha windows
                             ResetPhone();
@@ -334,6 +343,8 @@ void ShowLoginScreen(bool& proceedToCaptcha, bool& triggerDmail)
                     }
                     else // Entered a captcha, but it did not trigger a world line shift
                     {
+                        // I sort to display some error here, but we're fully resetting
+                        // so it may not be needed ┐(￣～￣)┌
                         ResetPhone();
                         phoneActivated = false;
                         proceedToCaptcha = false;

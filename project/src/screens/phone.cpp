@@ -1,10 +1,29 @@
-#include "phone.h"
+﻿#include "phone.h"
 
 #include "d3d_helpers.h"
 #include "d3d11.h"
 #include "imgui.h"
 #include "globals.h"
 
+// ****************************************************
+// The purpose of Gadget No. 17 is to have a permanent
+// fixture that can aid in the main site login process.
+//
+// This phone is attached via zip-ties to the main lab
+// computer to serve as a 2-factor form of authentication.
+// (Thank you Mayuri for your phone's sacrafice)
+// (っ´ω)ﾉ(╥ω╥)
+// 
+// Standard 2-factor authentication would not be enough
+// however, thus we use D-Mail to further protect our
+// site. Only those with the power to change time can
+// access the administrator section of our page and
+// view all of our secrets (/ω＼)
+// 
+//  ****************************************************
+
+// Sets the style, size, position, and texture of our digital
+// phone, note only the physical phone in the lab works correctly!
 void CreatePhoneWindow()
 {
     ImVec2 windowSize = ImVec2(400, 764); // Size of the phone
@@ -31,6 +50,7 @@ void CreatePhoneWindow()
     ImGui::Image((void*)PhoneTextureView, windowSize);
 }
 
+// (⌐■_■) Styleish
 void SetCaptchaStyles()
 {
     static float pulseTimer = 0.0f;
@@ -94,7 +114,8 @@ bool DrawPhone(string captcha, bool& successfulShift)
         {
             dmailSent = true;
 
-            // Did the worldline change? Engage reading steiner
+            // Okabe says only those with reading steiner can detect when
+            // the worldline has shifted, but none of us really feel it (゜-゜)
             if (captcha == string(phoneInputBuffer))
             {
                 successfulShift = true;
@@ -110,6 +131,7 @@ bool DrawPhone(string captcha, bool& successfulShift)
     return dmailSent;
 }
 
+// Powering off works too (－－) zzZ
 void ResetPhone()
 {
     dmailSent = false;

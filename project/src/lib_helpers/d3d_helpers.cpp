@@ -1,10 +1,11 @@
 #include "d3d_helpers.h"
 
 #include <d3d11.h>
+#include <random>
 #include <wincodec.h>
 #include <wrl/client.h>
-#include <random>
 #include "imgui_impl_dx11.h"
+#include "resource.h"
 #include "windows_helpers.h"
 
 ID3D11Device* g_pd3dDevice = nullptr;
@@ -100,12 +101,19 @@ int CreateD3DWindow(WNDCLASSEXW& outWc, HWND& outHandle)
     // Window setup
     int xPos = (screenWidth - width) / 2;
     int yPos = (screenHeight - height) / 2;
-    outWc = { sizeof(outWc), CS_CLASSDC, WndProc, 0L, 0L, GetModuleHandle(nullptr), nullptr, nullptr, nullptr, nullptr, L"ImGui Example", nullptr };
+
+    // Window icons
+    HINSTANCE hInstance = GetModuleHandle(nullptr);
+    HICON hIconLarge = LoadIcon(hInstance, MAKEINTRESOURCE(IDI_ICON1)); 
+    HICON hIconSmall = (HICON)LoadImage(hInstance, MAKEINTRESOURCE(IDI_ICON1), IMAGE_ICON, 16, 16, 0);
+
+    outWc = { sizeof(outWc), CS_CLASSDC, WndProc, 0L, 0L, hInstance, hIconLarge, nullptr, nullptr, nullptr, L"Future Gadget Lab Login", nullptr };
+    outWc.hIconSm = hIconSmall;
     ::RegisterClassExW(&outWc);
 
     outHandle = ::CreateWindowW(
         outWc.lpszClassName,
-        L"Future Gadget Lab Fullscreen Window",
+        L"Future Gadget Lab Login",
         WS_OVERLAPPEDWINDOW | WS_VISIBLE,
         xPos, yPos, width, height,
         nullptr, nullptr, outWc.hInstance, nullptr
@@ -194,6 +202,27 @@ ID3D11Texture2D* CreateNoiseD11Texture(ID3D11Device* device, const std::vector<u
     ID3D11Texture2D* texture = nullptr;
     device->CreateTexture2D(&desc, &initData, &texture);
     return texture;
+}
+
+// Makes a noisy texture to mimic a captcha window to waste dumb bots time!
+void GenerateNoisyTexture(ID3D11ShaderResourceView*& noiseTextureView, ImVec2 imageSize)
+{
+    int width = static_cast<int>(imageSize.x); int height = static_cast<int>(imageSize.y);
+
+    // Clear out any data currently in this pointer ref 
+    if (noiseTextureView != nullptr)
+    {
+        noiseTextureView->Release();
+        noiseTextureView = nullptr;
+    }
+
+    auto noiseData = GenerateNoiseData(width, height);
+    ID3D11Texture2D* noiseTexture = CreateNoiseD11Texture(g_pd3dDevice, noiseData, width, height);
+    if (noiseTexture)
+    {
+        noiseTextureView = CreateShaderResourceView(g_pd3dDevice, noiseTexture);
+        noiseTexture->Release();  // Release the texture object after creating the view
+    }
 }
 
 ID3D11ShaderResourceView* LoadTextureFromPNG(const wchar_t* filePath, ID3D11Device* device)
